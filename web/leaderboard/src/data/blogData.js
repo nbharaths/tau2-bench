@@ -23,9 +23,23 @@ export const PAPERS = {
     href: 'https://arxiv.org/abs/2603.13686',
     venue: 'arXiv 2026',
   },
+  tauRec: {
+    title: 'τ-Rec: A Verifiable Benchmark for Agentic Recommender Systems',
+    href: 'https://doi.org/10.1145/3773078.3831847',
+    venue: 'ACM RecSys 2026',
+  },
 }
 
 export const AUTHORS = {
+  'bharath-narasimhan': {
+    name: 'Bharath Sivaram Narasimhan',
+    role: 'Independent Researcher',
+    photo: '/community/assets/bharath-narasimhan.jpg',
+    bio: 'Bharath Sivaram Narasimhan is an independent researcher focused on verifiable evaluation methods for reliable agentic AI.',
+    paperKeys: ['tauRec'],
+    backHref: '/community',
+    backLabel: 'Community extensions',
+  },
   'victor-barres': {
     name: 'Victor Barres',
     role: 'Research Scientist at Sierra',
@@ -73,7 +87,7 @@ export const AUTHORS = {
     role: 'Head of Research at Sierra',
     sierraProfile: 'https://sierra.ai/author/karthik-narasimhan',
     bio: 'Karthik is Head of Research at Sierra and an associate professor of Computer Science at Princeton. He holds a PhD from MIT and co-authored the first GPT paper at OpenAI. He has been researching natural language processing, reinforcement learning, and AI agents for over a decade and has co-authored works like ReAct, Tree of Thoughts, CoALA and SWE-agent.',
-    paperKeys: ['tauBench', 'tau2Bench', 'tauKnowledge', 'tauVoice'],
+    paperKeys: ['tauBench', 'tau2Bench', 'tauKnowledge', 'tauVoice', 'tauRec'],
   },
   'shunyu-yao': {
     name: 'Shunyu Yao',
@@ -186,4 +200,5 @@ export const BLOG_POSTS = [
 
 export const postsByAuthor = (slug) => BLOG_POSTS.filter((p) => p.authorSlugs.includes(slug))
 
-export const authorPhoto = (slug) => `${import.meta.env.BASE_URL}authors/${slug}.jpg`
+export const authorPhoto = (slug) =>
+  AUTHORS[slug].photo ?? `${import.meta.env.BASE_URL}authors/${slug}.jpg`

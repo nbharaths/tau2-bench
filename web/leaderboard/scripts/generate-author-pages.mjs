@@ -1,5 +1,5 @@
 // Generates static, indexable author bio pages (public/authors/<slug>.html)
-// plus sitemap.xml and robots.txt from src/data/blogData.js.
+// plus sitemap.xml and robots.txt from the blog and community data.
 //
 // Runs automatically as part of `npm run build`; run `npm run generate` after
 // editing blogData.js to refresh the committed pages.
@@ -8,6 +8,7 @@ import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { AUTHORS, PAPERS, BLOG_POSTS } from '../src/data/blogData.js'
+import { COMMUNITY_EXTENSIONS } from '../src/data/communityExtensions.js'
 import { VIEW_PATHS } from '../src/routes.js'
 
 const SITE = 'https://taubench.com'
@@ -17,6 +18,8 @@ const esc = (s) =>
   s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')
 
 const postUrl = (post) => (post.href.startsWith('http') ? post.href : `/${post.href}`)
+
+const authorPhotoUrl = (slug) => AUTHORS[slug].photo ?? `/authors/${slug}.jpg`
 
 const truncate = (s, n) => (s.length <= n ? s : `${s.slice(0, s.lastIndexOf(' ', n))}…`)
 
@@ -28,7 +31,7 @@ const authorLine = (slugs) => {
   const photos = slugs
     .map(
       (slug) =>
-        `<a href="/authors/${slug}.html" class="post-author-photo-link" title="${esc(AUTHORS[slug].name)}"><img src="/authors/${slug}.jpg" alt="${esc(AUTHORS[slug].name)}" class="post-author-photo" /></a>`
+        `<a href="/authors/${slug}.html" class="post-author-photo-link" title="${esc(AUTHORS[slug].name)}"><img src="${authorPhotoUrl(slug)}" alt="${esc(AUTHORS[slug].name)}" class="post-author-photo" /></a>`
     )
     .join('')
   return `<div class="post-authors"><div class="post-author-photos">${photos}</div><span class="post-author-names">${names}</span></div>`
@@ -40,7 +43,13 @@ const postCard = (post) => {
         <a class="blog-card-link" href="${postUrl(post)}"${external ? ' target="_blank" rel="noopener noreferrer"' : ''}>
           <div class="blog-card-top">
             <span class="blog-card-label">${esc(post.category)} · ${esc(post.date)}</span>
-            ${external ? '<span class="blog-card-label">sierra.ai ↗</span>' : ''}
+            ${
+              post.sourceLabel
+                ? `<span class="blog-card-label">${esc(post.sourceLabel)}</span>`
+                : external
+                  ? '<span class="blog-card-label">sierra.ai ↗</span>'
+                  : ''
+            }
           </div>
           <h2 class="blog-card-title">${esc(post.title)}</h2>
           <p class="blog-card-description">${esc(post.description)}</p>
@@ -142,7 +151,11 @@ const STYLE = `
     }
     .footer a { color: #065f46; text-decoration: none; }
     @media (max-width: 640px) {
-      .nav-links { gap: 16px; }
+      .nav-container { align-items: flex-start; flex-direction: column; gap: 12px; }
+      .nav-links {
+        display: grid; grid-template-columns: repeat(3, max-content);
+        gap: 8px 18px;
+      }
       .nav-links a { font-size: 13px; }
       .page { padding: 32px 16px 48px; }
       .author-name { font-size: 1.6rem; }
@@ -173,8 +186,16 @@ const NAV = `<nav class="navbar">
 
 const authorPage = (slug, author) => {
   const description = truncate(author.bio, 155)
-  const posts = BLOG_POSTS.filter((p) => p.authorSlugs.includes(slug))
+  const communityPosts = COMMUNITY_EXTENSIONS.filter((extension) =>
+    extension.authors.some((candidate) => candidate.slug === slug)
+  ).map((extension) => ({
+    ...extension,
+    sourceLabel: 'Community',
+    authorSlugs: extension.authors.map((candidate) => candidate.slug),
+  }))
+  const posts = [...communityPosts, ...BLOG_POSTS.filter((p) => p.authorSlugs.includes(slug))]
   const papers = author.paperKeys.map((key) => PAPERS[key])
+  const photo = authorPhotoUrl(slug)
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -186,7 +207,7 @@ const authorPage = (slug, author) => {
   <meta property="og:type" content="profile">
   <meta property="og:title" content="${esc(author.name)} | τ-bench">
   <meta property="og:description" content="${esc(description)}">
-  <meta property="og:image" content="${SITE}/authors/${slug}.jpg">
+  <meta property="og:image" content="${SITE}${photo}">
   <meta property="og:url" content="${SITE}/authors/${slug}.html">
   <meta name="twitter:card" content="summary">
   <style>${STYLE}</style>
@@ -195,9 +216,9 @@ const authorPage = (slug, author) => {
   ${NAV}
 
   <div class="page">
-    <a href="/#blog" class="back-link">← All posts</a>
+    <a href="${author.backHref ?? '/#blog'}" class="back-link">← ${esc(author.backLabel ?? 'All posts')}</a>
     <header class="author-header">
-      <img src="/authors/${slug}.jpg" alt="${esc(author.name)}" class="author-photo" />
+      <img src="${photo}" alt="${esc(author.name)}" class="author-photo" />
       <div>
         <h1 class="author-name">${esc(author.name)}</h1>
         <p class="author-role">${esc(author.role)}</p>
@@ -247,6 +268,9 @@ for (const [slug, author] of Object.entries(AUTHORS)) {
 const urls = [
   `${SITE}/`,
   `${SITE}${VIEW_PATHS.community}`,
+  ...COMMUNITY_EXTENSIONS.filter((extension) => !extension.href.startsWith('http')).map(
+    (extension) => `${SITE}/${extension.href}`
+  ),
   ...BLOG_POSTS.filter((p) => !p.href.startsWith('http')).map((p) => `${SITE}/${p.href}`),
   ...Object.keys(AUTHORS).map((slug) => `${SITE}/authors/${slug}.html`),
 ]

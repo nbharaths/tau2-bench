@@ -3,22 +3,73 @@ import './Blog.css'
 import './Community.css'
 import { COMMUNITY_EXTENSIONS } from '../data/communityExtensions'
 
+const resolveHref = (href) =>
+  href.startsWith('http') ? href : `${import.meta.env.BASE_URL}${href}`
+
+function CommunityAuthorLine({ authors }) {
+  return (
+    <div className="post-authors community-authors">
+      <div className="post-author-photos">
+        {authors.map((author) => {
+          const external = author.profileUrl.startsWith('http')
+          return (
+            <a
+              key={author.name}
+              href={resolveHref(author.profileUrl)}
+              className="post-author-photo-link"
+              title={`${author.name} — ${author.affiliation}`}
+              {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            >
+              <img src={resolveHref(author.photo)} alt={author.name} className="post-author-photo" />
+            </a>
+          )
+        })}
+      </div>
+      <div className="community-author-details">
+        <span className="post-author-names">
+          {authors.map((author, index) => {
+            const external = author.profileUrl.startsWith('http')
+            return (
+              <span key={author.name}>
+                {index > 0 && (index === authors.length - 1 ? ' & ' : ', ')}
+                <a
+                  href={resolveHref(author.profileUrl)}
+                  className="post-author-name"
+                  {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                >
+                  {author.name}
+                </a>
+              </span>
+            )
+          })}
+        </span>
+        <span className="community-author-affiliations">
+          {authors.map((author, index) => (
+            <span key={author.name}>
+              {index > 0 && ' · '}{author.affiliation}
+            </span>
+          ))}
+        </span>
+      </div>
+    </div>
+  )
+}
+
 function CommunityCard({ extension }) {
   return (
     <article className="blog-card community-card">
       <a
         className="blog-card-link"
-        href={extension.githubUrl}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={resolveHref(extension.href)}
       >
         <div className="blog-card-top">
           <span className="blog-card-label">{extension.category} · {extension.date}</span>
-          <span className="blog-card-source">GitHub ↗</span>
+          <span className="blog-card-source">Read more →</span>
         </div>
         <h2 className="blog-card-title">{extension.title}</h2>
         <p className="blog-card-description">{extension.description}</p>
       </a>
+      <CommunityAuthorLine authors={extension.authors} />
     </article>
   )
 }

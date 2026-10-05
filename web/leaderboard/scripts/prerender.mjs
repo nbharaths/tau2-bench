@@ -57,7 +57,7 @@ const GUARDS = {
     forbidden: [],
   },
   '/community': {
-    required: [/Community Extensions/, /github\.com\/nbharaths\/tau-rec/],
+    required: [/Community Extensions/, /community\/tau-rec\.html/],
     forbidden: [],
     minBytes: 6000,
   },
