@@ -8,6 +8,7 @@ import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { AUTHORS, PAPERS, BLOG_POSTS } from '../src/data/blogData.js'
+import { VIEW_PATHS } from '../src/routes.js'
 
 const SITE = 'https://taubench.com'
 const publicDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'public')
@@ -164,6 +165,7 @@ const NAV = `<nav class="navbar">
         <a href="/#leaderboard">Leaderboard</a>
         <a href="/#trajectory-visualizer">Visualizer</a>
         <a href="/#blog">Blog</a>
+        <a href="/community">Community</a>
         <a href="https://github.com/sierra-research/tau2-bench" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>
     </div>
@@ -244,6 +246,7 @@ for (const [slug, author] of Object.entries(AUTHORS)) {
 
 const urls = [
   `${SITE}/`,
+  `${SITE}${VIEW_PATHS.community}`,
   ...BLOG_POSTS.filter((p) => !p.href.startsWith('http')).map((p) => `${SITE}/${p.href}`),
   ...Object.keys(AUTHORS).map((slug) => `${SITE}/authors/${slug}.html`),
 ]

@@ -56,6 +56,11 @@ const GUARDS = {
     required: [/τ-voice/i],
     forbidden: [],
   },
+  '/community': {
+    required: [/Community Extensions/, /github\.com\/nbharaths\/tau-rec/],
+    forbidden: [],
+    minBytes: 6000,
+  },
 }
 
 const MIME = {

@@ -29,6 +29,7 @@ export const ROUTES = {
   '/progress': 'leaderboard',
   '/trajectory-visualizer': 'trajectory-visualizer',
   '/blog': 'blog',
+  '/community': 'community',
 }
 
 // Canonical path for each view (used for navigation and canonical/og:url).
@@ -37,6 +38,7 @@ export const VIEW_PATHS = {
   leaderboard: '/leaderboard',
   'trajectory-visualizer': '/trajectory-visualizer',
   blog: '/blog',
+  community: '/community',
 }
 
 const SITE_TITLE = 'τ-bench — Benchmarking AI Agents on Real-World Tasks'
@@ -61,6 +63,11 @@ export const PAGE_META = {
   blog: {
     title: 'Blog — τ-bench',
     description: 'Research updates and release notes from the τ-bench team.',
+  },
+  community: {
+    title: 'Community Extensions — τ-bench',
+    description:
+      'Community-built projects that extend τ-bench to new domains and agent evaluation settings.',
   },
 }
 

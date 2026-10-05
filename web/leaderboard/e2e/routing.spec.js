@@ -38,6 +38,80 @@ test('direct load: blog and visualizer', async ({ page }) => {
   await expect(page).toHaveTitle(/Visualizer — τ-bench/)
 })
 
+test('direct load: community extensions', async ({ page }) => {
+  await page.goto('/community')
+  await expect(page).toHaveTitle(/Community Extensions — τ-bench/)
+  await expect(page.getByRole('heading', { name: 'Community Extensions' })).toBeVisible()
+
+  const tauRecCard = page.locator('.community-card').filter({ hasText: 'τ-Rec' })
+  await expect(tauRecCard).toHaveCount(1)
+  await expect(tauRecCard).toContainText('τ-Rec')
+  await expect(tauRecCard.locator('a')).toHaveAttribute('href', 'https://github.com/nbharaths/tau-rec')
+  await expect(tauRecCard.locator('a')).toHaveAttribute('target', '_blank')
+})
+
+test('community extensions page and nav stay responsive', async ({ page }) => {
+  await page.goto('/community')
+
+  for (const width of [769, 800, 900, 1100, 1101, 1150, 1440]) {
+    await page.setViewportSize({ width, height: 800 })
+    const layout = await page.evaluate(() => ({
+      hasHorizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
+      navItems: [...document.querySelectorAll('.nav-links > *')].map((item) => {
+        const rect = item.getBoundingClientRect()
+        return { left: rect.left, right: rect.right, height: rect.height }
+      }),
+    }))
+
+    expect(layout.hasHorizontalOverflow).toBe(false)
+    for (const item of layout.navItems) {
+      expect(item.left).toBeGreaterThanOrEqual(0)
+      expect(item.right).toBeLessThanOrEqual(width)
+      expect(item.height).toBeLessThanOrEqual(25)
+    }
+  }
+})
+
+test('community extensions is available from the mobile nav', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+
+  await page.locator('.mobile-menu-toggle').click()
+  const communityLink = page.getByRole('button', { name: 'Community' })
+  await expect(communityLink).toBeVisible()
+  await communityLink.click()
+
+  await expect(page).toHaveURL(/\/community$/)
+  await expect(page).toHaveTitle(/Community Extensions — τ-bench/)
+  await expect(page.getByRole('heading', { name: 'Community Extensions' })).toBeVisible()
+  await expect(page.locator('.nav-links')).toHaveClass(/mobile-hidden/)
+
+  await page.locator('.mobile-menu-toggle').click()
+  await expect(page.getByRole('button', { name: 'Community' })).toHaveClass(/active/)
+})
+
+test('community extensions footer reaches the bottom on a tall viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 890 })
+  await page.goto('/community')
+
+  const footerBottom = await page.locator('.simple-footer').evaluate(
+    (footer) => footer.getBoundingClientRect().bottom
+  )
+  expect(footerBottom).toBeGreaterThanOrEqual(889)
+})
+
+test('static author and published blog pages link to community extensions', async ({ page }) => {
+  for (const path of [
+    '/authors/soham-ray.html',
+    '/blog/tau-knowledge.html',
+    '/blog/tau-voice-examples.html',
+    '/blog/tau3-task-fixes.html',
+  ]) {
+    await page.goto(path)
+    await expect(page.getByRole('link', { name: 'Community' })).toHaveAttribute('href', '/community')
+  }
+})
+
 // ---------------------------------------------------------------------------
 // Prerendered HTML: content and per-route meta exist without JavaScript.
 // ---------------------------------------------------------------------------
@@ -56,6 +130,17 @@ test('prerendered homepage HTML contains preview cards', async ({ request }) => 
   const html = await (await request.get('/')).text()
   expect(html).toContain('preview-table-wrapper')
   expect(html).not.toContain('Loading leaderboard')
+})
+
+test('prerendered community HTML contains the extension and meta', async ({ request }) => {
+  const res = await request.get('/community')
+  expect(res.status()).toBe(200)
+  const html = await res.text()
+  expect(html).toContain('<title>Community Extensions — τ-bench</title>')
+  expect(html).toContain('property="og:title"')
+  expect(html).toContain('τ-Rec')
+  expect(html).toContain('https://github.com/nbharaths/tau-rec')
+  expect(html).toContain('https://taubench.com/community')
 })
 
 // ---------------------------------------------------------------------------
