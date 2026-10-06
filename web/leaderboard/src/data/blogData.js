@@ -38,7 +38,7 @@ export const AUTHORS = {
     bio: 'Bharath Sivaram Narasimhan is an independent researcher focused on verifiable evaluation methods for reliable agentic AI.',
     paperKeys: ['tauRec'],
     backHref: '/community',
-    backLabel: 'Community extensions',
+    backLabel: 'Community spotlight',
   },
   'victor-barres': {
     name: 'Victor Barres',

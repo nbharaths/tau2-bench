@@ -65,9 +65,9 @@ export const PAGE_META = {
     description: 'Research updates and release notes from the τ-bench team.',
   },
   community: {
-    title: 'Community Extensions — τ-bench',
+    title: 'Community Spotlight — τ-bench',
     description:
-      'Community-built projects that extend τ-bench to new domains and agent evaluation settings.',
+      'Community spotlights on projects that build on τ-bench across new domains and agent evaluation settings.',
   },
 }
 

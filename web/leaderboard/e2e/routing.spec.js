@@ -38,10 +38,10 @@ test('direct load: blog and visualizer', async ({ page }) => {
   await expect(page).toHaveTitle(/Visualizer — τ-bench/)
 })
 
-test('direct load: community extensions', async ({ page }) => {
+test('direct load: community spotlight', async ({ page }) => {
   await page.goto('/community')
-  await expect(page).toHaveTitle(/Community Extensions — τ-bench/)
-  await expect(page.getByRole('heading', { name: 'Community Extensions' })).toBeVisible()
+  await expect(page).toHaveTitle(/Community Spotlight — τ-bench/)
+  await expect(page.getByRole('heading', { name: 'Community Spotlight' })).toBeVisible()
 
   const tauRecCard = page.locator('.community-card').filter({ hasText: 'τ-Rec' })
   await expect(tauRecCard).toHaveCount(1)
@@ -146,7 +146,7 @@ test('τ-Rec community spotlight stays responsive and its mobile nav works', asy
   await expect(page.getByRole('link', { name: 'Community' })).toBeVisible()
 })
 
-test('community extensions page and nav stay responsive', async ({ page }) => {
+test('community spotlight page and nav stay responsive', async ({ page }) => {
   await page.goto('/community')
 
   for (const width of [769, 800, 900, 1100, 1101, 1150, 1440]) {
@@ -195,7 +195,7 @@ test('Bharath author page contains concise bio, paper, and community spotlight',
   }
 })
 
-test('community extensions is available from the mobile nav', async ({ page }) => {
+test('community spotlight is available from the mobile nav', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')
 
@@ -205,15 +205,15 @@ test('community extensions is available from the mobile nav', async ({ page }) =
   await communityLink.click()
 
   await expect(page).toHaveURL(/\/community$/)
-  await expect(page).toHaveTitle(/Community Extensions — τ-bench/)
-  await expect(page.getByRole('heading', { name: 'Community Extensions' })).toBeVisible()
+  await expect(page).toHaveTitle(/Community Spotlight — τ-bench/)
+  await expect(page.getByRole('heading', { name: 'Community Spotlight' })).toBeVisible()
   await expect(page.locator('.nav-links')).toHaveClass(/mobile-hidden/)
 
   await page.locator('.mobile-menu-toggle').click()
   await expect(page.getByRole('button', { name: 'Community' })).toHaveClass(/active/)
 })
 
-test('community extensions footer reaches the bottom on a tall viewport', async ({ page }) => {
+test('community spotlight footer reaches the bottom on a tall viewport', async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 890 })
   await page.goto('/community')
 
@@ -223,7 +223,7 @@ test('community extensions footer reaches the bottom on a tall viewport', async 
   expect(footerBottom).toBeGreaterThanOrEqual(889)
 })
 
-test('static author and published blog pages link to community extensions', async ({ page }) => {
+test('static author and published blog pages link to community spotlight', async ({ page }) => {
   for (const path of [
     '/authors/soham-ray.html',
     '/blog/tau-knowledge.html',
@@ -255,11 +255,11 @@ test('prerendered homepage HTML contains preview cards', async ({ request }) => 
   expect(html).not.toContain('Loading leaderboard')
 })
 
-test('prerendered community HTML contains the extension and meta', async ({ request }) => {
+test('prerendered community HTML contains the spotlight and meta', async ({ request }) => {
   const res = await request.get('/community')
   expect(res.status()).toBe(200)
   const html = await res.text()
-  expect(html).toContain('<title>Community Extensions — τ-bench</title>')
+  expect(html).toContain('<title>Community Spotlight — τ-bench</title>')
   expect(html).toContain('property="og:title"')
   expect(html).toContain('τ-Rec')
   expect(html).toContain('/community/tau-rec.html')

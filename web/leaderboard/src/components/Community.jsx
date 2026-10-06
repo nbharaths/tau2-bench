@@ -82,7 +82,7 @@ function Community() {
   return (
     <div className="blog-page community-page">
       <header className="blog-page-header">
-        <h1 className="blog-page-title">Community Extensions</h1>
+        <h1 className="blog-page-title">Community Spotlight</h1>
         <p className="blog-page-subtitle">
           Projects from the research community that build on τ-bench and extend
           agent evaluation to new domains and settings.
